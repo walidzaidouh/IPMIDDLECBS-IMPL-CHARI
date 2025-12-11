@@ -1,0 +1,83 @@
+package ma.ip.services;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.ip.dto.accounting.CreateCreRequestDTO;
+import ma.ip.dto.accounting.CreateCreResponseDTO;
+import ma.ip.dto.accounting.request.AccountingRootRequest;
+import ma.ip.dto.accounting.response.AccountingRootResponse;
+import ma.ip.enums.AccountingStatusEnum;
+import ma.ip.enums.MessageDirectionEnum;
+import ma.ip.exceptions.ProxyRequestException;
+import ma.ip.mappers.AccountingMapper;
+import ma.ip.proxies.apigee.AccountingProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+/**
+ * The Service AccountingServiceCbsImpl.
+ */
+@Service
+@Slf4j
+public class AccountingServiceCbsImpl implements AccountingServiceCbs{
+
+    private final AccountingProxy accountingProxy;
+
+    @Autowired
+    private AccountingMapper accountingMapper;
+
+    public AccountingServiceCbsImpl(AccountingProxy accountingProxy) {
+        this.accountingProxy = accountingProxy;
+    }
+
+    @Value("${ip.apigee.regex.pattern:[';()|&<>*^\\\\\\x00]}")
+    String specialCharactersList;
+
+    @Override
+    public CreateCreResponseDTO createCre(CreateCreRequestDTO createCreRequestDTO) {
+
+        CreateCreResponseDTO result = new CreateCreResponseDTO();
+        AccountingRootRequest accountingRootRequest = new AccountingRootRequest();
+        if (MessageDirectionEnum.SEND.getCode().equals(createCreRequestDTO.getSens()))
+            accountingRootRequest.setSens("DEBIT");
+        else
+            accountingRootRequest.setSens("CREDIT");
+        accountingRootRequest.setTransferId(createCreRequestDTO.getMsgId());
+        accountingRootRequest.setTransferBankId(createCreRequestDTO.getTransferBankId());
+        accountingRootRequest.setTxId(createCreRequestDTO.getTxId());
+        accountingRootRequest.setRibSender(createCreRequestDTO.getRibSender());
+        accountingRootRequest.setRibReceiver(createCreRequestDTO.getRibReceiver());
+        accountingRootRequest.setFullNameSender(createCreRequestDTO.getFullNameSender());
+        accountingRootRequest.setFullNameReceiver(createCreRequestDTO.getFullNameReceiver());
+        accountingRootRequest.setDate(createCreRequestDTO.getDate());
+
+        AccountingRootResponse accountRootResponse = new AccountingRootResponse();
+
+        log.info("[ REQUEST - POST - EVENT  ] TRANSACTION CODE "+ accountingRootRequest.getTransferBankId() + " TX ID " + accountingRootRequest.getTxId());
+        long start = System.currentTimeMillis();
+        try {
+            accountRootResponse = accountingProxy.createCre(accountingRootRequest);
+
+            long executionTime = System.currentTimeMillis() - start;
+            result = accountingMapper.toCreateCreResponse(accountRootResponse);
+            result.setStatus(AccountingStatusEnum.OK.getValue());
+            log.info("[ RESPONSE - POST - EVENT SUCCESS ] DURATION " + executionTime + " ms " + " RESPONSE " + accountRootResponse );
+        }catch(ProxyRequestException e) {
+            long executionTime = System.currentTimeMillis() - start;
+            log.error("[ RESPONSE - POST - EVENT FAILURE ] " + " STATUS " + e.getStatus() + " DURATION " + executionTime + " ms");
+            result.setCode(e.getBody().get("code"));
+            result.setMessage(e.getBody().get("message"));
+            result.setStatus(AccountingStatusEnum.OK.getValue());
+        }catch(feign.RetryableException e) {
+            // Timeout client
+            long executionTime = System.currentTimeMillis() - start;
+            result.setStatus(AccountingStatusEnum.TIMEOUT.getValue());
+            log.error("TIMEOUT_ERROR ACCOUNTING API TIMEOUT EXCEEDED " + executionTime + " ms");
+        }catch (Exception e) {
+            result.setStatus(AccountingStatusEnum.ERROR.getValue());
+            log.error("UNEXPECTED_ERROR " + e.getMessage());
+        }
+
+        return result;
+    }
+}
