@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         configuration = ApigeeRequestInterceptor.class)
 public interface AccountingProxy {
 
-    @PostMapping("/api/mobile/simt/vi/s2s/advice")
-    @AuditableServiceActivity(activityName = "advice", type = AuditableUserActivityEnum.WRITE, saveRequest = true, saveResponse = true, destination = "external.api.url.accounting", resource = "api/mobile/simt/s2s/advice")
+    @PostMapping("/api/walit/advice")
+    @AuditableServiceActivity(activityName = "advice", type = AuditableUserActivityEnum.WRITE, saveRequest = true, saveResponse = true, destination = "external.api.url.accounting", resource = "api/walit/advice")
     AccountingRootResponse createCre(@RequestBody AccountingRootRequest accountingRootRequest);
 }

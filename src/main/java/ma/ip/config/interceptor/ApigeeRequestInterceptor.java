@@ -64,8 +64,6 @@ public class ApigeeRequestInterceptor {
     @Value("${ip.request.id.header:X-Request-Id}")
     private String requestId;
 
-    @Value("${ip.request.content.header:Content-Type}")
-    private String contentType;
 
     @Value("${ip.request.signature.header:X-Timestamp}")
     private String xTimestamp;
@@ -73,11 +71,28 @@ public class ApigeeRequestInterceptor {
     private String xSignature;
     @Value("${ip.request.signature.secret:}")
     private String secret;
+
     @Value("${ip.request.apikey.header:X-API-Key}")
     private String xApiKey;
     @Value("${ip.request.apikey.value:}")
     private String xApiKeyValue;
 
+    @Value("${ip.request.content.header:Content-Type}")
+    private String contentType;
+
+    @Value("${ip.request.accept.header:accept}")
+    private String accept;
+    @Value("${ip.request.partnerid.header:PartnerId}")
+    private String partnerId;
+    @Value("${ip.request.version.header:Version}")
+    private String version;
+
+    @Value("${ip.request.accept.value:}")
+    private String acceptValue;
+    @Value("${ip.request.partnerid.value:}")
+    private String partnerIdHeaderValue;
+    @Value("${ip.request.version.value:}")
+    private String versionHeadValue;
 
     @Autowired
     private TokenApigeeService tokenApigeeService;
@@ -147,6 +162,9 @@ public class ApigeeRequestInterceptor {
             requestTemplate.removeHeader(xSignature);
             requestTemplate.removeHeader(xApiKey);
             requestTemplate.header(contentType, "application/json");
+            requestTemplate.header(accept,acceptValue);
+            requestTemplate.header(version, versionHeadValue);
+            requestTemplate.header(partnerId, partnerIdHeaderValue);
 
             final long timestamp = System.currentTimeMillis();
             requestTemplate.header(xTimestamp, String.valueOf(timestamp));

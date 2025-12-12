@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface AccountProxy {
 
 
-    @PostMapping("/api/mobile/simt/vi/s2s/credit/authorize")
-    @AuditableServiceActivity(activityName = "authorize", type = AuditableUserActivityEnum.WRITE, saveRequest = true, saveResponse = true, destination = "external.api.url.account", resource = "api/mobile/simt/vi/s2s/credit/authorize")
+    @PostMapping("/api/walit/authorize")
+    @AuditableServiceActivity(activityName = "authorize", type = AuditableUserActivityEnum.WRITE, saveRequest = true, saveResponse = true, destination = "external.api.url.account", resource = "api/walit/authorize")
     AccountRootResponse details(@RequestBody AccountRootRequestDto accountRootRequestDto);
 
 }

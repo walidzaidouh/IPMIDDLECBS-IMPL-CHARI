@@ -2,6 +2,8 @@ package ma.ip.dto.accounting.request;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class AccountingRootRequest {
 
@@ -14,6 +16,7 @@ public class AccountingRootRequest {
     private String fullNameSender;
     private String fullNameReceiver;
     private String date;
+    private BigDecimal amount;
 
     @Override
     public String toString() {
@@ -26,7 +29,7 @@ public class AccountingRootRequest {
                 ",\"txId\":\"" + txId  + "\"" +
                 ",\"fullNameSender\":\"" + fullNameSender  + "\"" +
                 ",\"fullNameReceiver\":\"" + fullNameReceiver  + "\"" +
-                ",\"date\":\"" + date  + "\"" +
+                ",\"date\":\"" + date  + "\"" + ",\"amount\":\"" + amount+ "\""+
                 "}";
     }
 }
