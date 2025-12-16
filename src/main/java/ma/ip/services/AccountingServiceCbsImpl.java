@@ -50,6 +50,7 @@ public class AccountingServiceCbsImpl implements AccountingServiceCbs{
         accountingRootRequest.setFullNameSender(createCreRequestDTO.getFullNameSender());
         accountingRootRequest.setFullNameReceiver(createCreRequestDTO.getFullNameReceiver());
         accountingRootRequest.setDate(createCreRequestDTO.getDate());
+        accountingRootRequest.setAmount(createCreRequestDTO.getAmount());
 
         AccountingRootResponse accountRootResponse = new AccountingRootResponse();
 
