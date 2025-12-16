@@ -188,7 +188,7 @@ public class ApigeeRequestInterceptor {
             }
             System.out.println("Request As String: " + requestAsStringBuilder.toString());
             String xSignatureValue = SecurityUtils.getRequestSignature(requestAsStringBuilder.toString(), secret);
-            requestTemplate.header(xSignature, xSignatureValue);
+//            requestTemplate.header(xSignature, xSignatureValue);
             requestTemplate.header(xApiKey, xApiKeyValue);
             //requestTemplate.uri(requestTemplate.request().url().replace("%2B", "+"));
         };
