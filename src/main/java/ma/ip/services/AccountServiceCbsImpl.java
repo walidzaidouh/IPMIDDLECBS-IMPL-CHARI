@@ -46,7 +46,10 @@ public class AccountServiceCbsImpl implements AccountServiceCbs {
         accountRootRequestDto.setTxId(request.getTxId());
         accountRootRequestDto.setRib(request.getRib());
         accountRootRequestDto.setTransferId(request.getRequestId());
+/*
         AccountRootResponse response = null;
+*/
+        AccountMainRootResponse response = null;
 
         log.info("[ REQUEST - GET - ACCOUNT DETAILS  ]  " + request.getRib() + " TXID " + request.getTxId());
 
@@ -84,14 +87,12 @@ public class AccountServiceCbsImpl implements AccountServiceCbs {
         // Start Mapping Response returned from API Account
         if (response != null) {
             result = new GetAccountDetailsResponseDTO();
-            result.setCode(response.getCode());
-            result.setMessage(response.getMessage());
-            if (response.getOutputData() != null) {
-                result.setCurrency(response.getOutputData().getCurrency());
-                result.setTransferBankId(response.getOutputData().getTransferBankId());
-
+            result.setCode(response.getData().getCode());
+            result.setMessage(response.getData().getMessage());
+            if (response.getData().getOutputData() != null) {
+                result.setCurrency(response.getData().getOutputData().getCurrency());
+                result.setTransferBankId(response.getData().getOutputData().getTransferBankId());
             }
-
         }
 
         return result;
