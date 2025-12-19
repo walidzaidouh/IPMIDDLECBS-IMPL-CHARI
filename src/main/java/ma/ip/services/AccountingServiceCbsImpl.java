@@ -7,6 +7,7 @@ import ma.ip.dto.accounting.request.AccountingRootRequest;
 import ma.ip.dto.accounting.response.AccountingMainRootResponse;
 import ma.ip.dto.accounting.response.AccountingRootResponse;
 import ma.ip.enums.AccountingStatusEnum;
+import ma.ip.enums.DecisionEnum;
 import ma.ip.enums.MessageDirectionEnum;
 import ma.ip.exceptions.ProxyRequestException;
 import ma.ip.mappers.AccountingMapper;
@@ -43,10 +44,21 @@ public class AccountingServiceCbsImpl implements AccountingServiceCbs{
 
         CreateCreResponseDTO result = new CreateCreResponseDTO();
         AccountingRootRequest accountingRootRequest = new AccountingRootRequest();
-        if (MessageDirectionEnum.SEND.getCode().equals(createCreRequestDTO.getSens()))
+//        if (MessageDirectionEnum.SEND.getCode().equals(createCreRequestDTO.getSens()))
+//            accountingRootRequest.setSens("DEBIT");
+//        else
+//            accountingRootRequest.setSens("CREDIT");
+//
+        if(DecisionEnum.RJCT.code().equals(createCreRequestDTO.getSens()))
+        {
+            accountingRootRequest.setSens(DecisionEnum.RJCT.code());
+        }else if (MessageDirectionEnum.SEND.getCode().equals(createCreRequestDTO.getSens()))
+        {
             accountingRootRequest.setSens("DEBIT");
-        else
+        }else {
             accountingRootRequest.setSens("CREDIT");
+        }
+
         accountingRootRequest.setTransferId(createCreRequestDTO.getMsgId());
         accountingRootRequest.setTransferBankId(createCreRequestDTO.getTransferBankId());
         accountingRootRequest.setTxId(createCreRequestDTO.getTxId());
@@ -100,6 +112,7 @@ public class AccountingServiceCbsImpl implements AccountingServiceCbs{
             // Timeout client
             long executionTime = System.currentTimeMillis() - start;
             result.setStatus(AccountingStatusEnum.TIMEOUT.getValue());
+            result.setMessage("TIME OUT");
             log.error("TIMEOUT_ERROR ACCOUNTING API TIMEOUT EXCEEDED " + executionTime + " ms");
         }catch (Exception e) {
             result.setStatus(AccountingStatusEnum.ERROR.getValue());
